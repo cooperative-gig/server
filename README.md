@@ -1,1 +1,1 @@
-# cooperative-gig-server
+# Cooperative Gig - Backend Server
