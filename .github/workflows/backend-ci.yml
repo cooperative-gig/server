@@ -31,3 +31,5 @@ jobs:
 
       - name: Validate Prisma schema
         run: pnpm exec prisma validate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/cooperative_gig?schema=public
