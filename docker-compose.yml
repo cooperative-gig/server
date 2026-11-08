@@ -1,0 +1,56 @@
+services:
+  postgres_db: # SERVICE NAME
+    image: postgres:17-alpine
+    container_name: cooperative_gig_db
+    # CONFIGURATION SETTING TO SETUP DATABASE
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    # PORTS HOST TO CONTAINER
+    ports:
+      - "5432:5432"
+    # VOLUMES TO STORE DATA IN CASE OF ANY DISATER
+    volumes:
+      - cooperative_gig_data:/var/lib/postgresql/data
+    # AUTO START AFTER IT IS CRASHES
+    restart: unless-stopped
+    networks:
+      - backend_network
+    # health block for express knows, is POSTGRESQL ready to accept queries
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+# EXPRESS SERVER CONTAINER
+  express_api:
+    build: .
+    container_name: cooperative_gig_api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: ${PORT}
+      DATABASE_URL: ${DATABASE_URL}
+    # depends_on:
+    #   postgres_db:
+    #     condition: service_healthy
+    networks:
+      - backend_network
+    # Development command
+    command: sh -c "pnpm exec prisma generate && pnpm dev"
+    # command: pnpm dev #Nodemon start karega.
+    # Source code hot reload
+    volumes: #Host source code container ke /app se synchronize karega
+      - .:/app
+      - /app/node_modules
+
+# GLOBAL NETWORKS & VOLUME MOUNT
+networks:
+  backend_network:
+    driver: bridge
+
+volumes:
+  cooperative_gig_data:
