@@ -40,7 +40,7 @@ services:
     networks:
       - backend_network
     # Development command
-    command: sh -c "pnpm exec prisma generate && pnpm dev"
+    command: sh -c "pnpm exec prisma generate --config prisma7.config.js && pnpm dev"
     # command: pnpm dev #Nodemon start karega.
     # Source code hot reload
     volumes: #Host source code container ke /app se synchronize karega
