@@ -5,3 +5,39 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// Worker Module
+
+model Worker {
+  id                    String    @id @default(uuid()) @db.Uuid
+  cooperativeId         String    @db.Uuid
+  serviceId             String    @db.Uuid
+  fullName              String
+  phone                 String
+  joiningDate           DateTime  @db.Date
+  profileStatus         String
+  accountStatus         String
+  isAvailable           Boolean
+  availabilityStartTime DateTime? @db.Time(6)
+  availabilityEndTime   DateTime? @db.Time(6)
+  requestedAt           DateTime  @db.Timestamp(6)
+  reviewedBy            String?   @db.Uuid
+  reviewedAt            DateTime? @db.Timestamp(6)
+  rejectionReason       String?
+
+  qualifications WorkerQualification[]
+
+  @@map("workers")
+}
+
+model WorkerQualification {
+  id                 String  @id @default(uuid()) @db.Uuid
+  workerId           String  @db.Uuid
+  qualificationName  String
+  documentUrl        String?
+  verificationStatus String
+
+  worker Worker @relation(fields: [workerId], references: [id])
+
+  @@map("worker_qualifications")
+}
